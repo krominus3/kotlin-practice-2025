@@ -1,5 +1,6 @@
 package com.example.myapplication.errors.presentation.screen
 
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.padding
@@ -13,26 +14,31 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.example.myapplication.Errors
+import com.example.myapplication.ErrorsDetails
 import com.example.myapplication.errors.presentation.MockData
 import com.example.myapplication.errors.presentation.model.ErrorsUiModel
+import com.example.myapplication.navigation.Route
+import com.example.myapplication.navigation.TopLevelBackStack
 
 @Composable
-fun ErrorsListScreen() {
+fun ErrorsListScreen(topLevelBackStack: TopLevelBackStack<Route>) {
     val errors = remember { MockData.getErrors() }
 
     LazyColumn {
         errors.forEach { errors ->
             item(key = errors.code) {
-                ErrorsListItem(errors)
+                ErrorsListItem(errors) { topLevelBackStack.addTopLevel(ErrorsDetails(it)) }
             }
         }
     }
 }
 
 @Composable
-fun ErrorsListItem(errors: ErrorsUiModel){
+fun ErrorsListItem(errors: ErrorsUiModel, onErrorsClick: (ErrorsUiModel) -> Unit){
     Column(
         modifier = Modifier
+            .clickable { onErrorsClick(errors) }
             .padding(horizontal = 16.dp)
             .padding(top = 8.dp),
         verticalArrangement = Arrangement.spacedBy(4.dp),
@@ -62,5 +68,5 @@ fun ErrorsListItem(errors: ErrorsUiModel){
 @Preview(showBackground = true)
 @Composable
 fun ErrorsListPreview() {
-    ErrorsListScreen()
+    ErrorsListScreen(TopLevelBackStack<Route>(Errors))
 }
