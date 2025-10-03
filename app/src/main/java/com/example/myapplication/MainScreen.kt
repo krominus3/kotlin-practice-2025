@@ -8,7 +8,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.List
 import androidx.compose.material.icons.filled.Home
-import androidx.compose.material.icons.filled.List
 import androidx.compose.material3.Icon
 import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
@@ -22,6 +21,7 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.navigation3.runtime.entryProvider
 import androidx.navigation3.ui.NavDisplay
+import com.example.myapplication.errors.presentation.screen.ErrorsListScreen
 import com.example.myapplication.navigation.Route
 import com.example.myapplication.navigation.TopLevelBackStack
 
@@ -33,7 +33,7 @@ data object Errors: TopLevelRoute {
     override val icon: ImageVector = Icons.Default.Home
 }
 
-data object News: TopLevelRoute {
+data object ReadMore: TopLevelRoute {
     override val icon: ImageVector = Icons.AutoMirrored.Default.List
 }
 
@@ -43,7 +43,7 @@ fun MainScreen() {
 
     Scaffold(bottomBar = {
         NavigationBar {
-            listOf(Errors, News).forEach { route ->
+            listOf(Errors, ReadMore).forEach { route ->
                 NavigationBarItem(
                     icon = { Icon(route.icon, null) },
                     selected = topLevelBackStack.topLevelKey == route,
@@ -60,10 +60,10 @@ fun MainScreen() {
             modifier = Modifier.padding(padding),
             entryProvider = entryProvider {
                 entry<Errors> {
-                    ContentWhite("Errors")
+                    ErrorsListScreen()
                 }
-                entry<News> {
-                    ContentGreen("News") { }
+                entry<ReadMore> {
+                    ContentGreen("ReadMore") { }
                 }
             }
         )
