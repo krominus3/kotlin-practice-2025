@@ -12,6 +12,10 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableFloatStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.style.TextOverflow
@@ -24,6 +28,7 @@ import com.example.myapplication.errors.presentation.model.ErrorsUiModel
 import com.example.myapplication.errors.presentation.model.SeeAlsoModel
 import com.example.myapplication.navigation.Route
 import com.example.myapplication.navigation.TopLevelBackStack
+import com.example.myapplication.uikit.RatingBar
 
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -45,10 +50,12 @@ fun ErrorsDetailsDialog(
 fun ErrorsDetailsContent(errors: ErrorsUiModel) {
     Column(
         modifier = Modifier
-            .padding(horizontal = 16.dp)
+            .padding(horizontal = 12.dp)
             .verticalScroll(rememberScrollState()),
         verticalArrangement = Arrangement.spacedBy(8.dp),
     ) {
+        var rating by remember { mutableFloatStateOf(0f) }
+
         Text (
             text = errors.code,
             style = MaterialTheme.typography.titleLarge,
@@ -67,6 +74,21 @@ fun ErrorsDetailsContent(errors: ErrorsUiModel) {
             modifier = Modifier.fillMaxWidth(),
             contentScale = ContentScale.FillWidth,
         )
+
+        Text(
+            text = "Rate the meme",
+            style = MaterialTheme.typography.titleMedium,
+
+        )
+
+        RatingBar(
+            rating,
+            modifier = Modifier.fillMaxWidth(),
+        ) {
+            rating = it
+        }
+
+        Text(text = if (rating > 0f) "Your assessment: $rating" else "You haven't appreciated the meme yet")
 
         Text(
             text = "Description",
