@@ -28,65 +28,78 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.bumptech.glide.integration.compose.ExperimentalGlideComposeApi
 import com.bumptech.glide.integration.compose.GlideImage
 import com.example.myapplication.errors.presentation.MockData
+import com.example.myapplication.errors.presentation.model.ErrorsDetailsViewState
 import com.example.myapplication.errors.presentation.model.ErrorsUiModel
 import com.example.myapplication.errors.presentation.model.SeeAlsoModel
+import com.example.myapplication.errors.presentation.viewModel.ErrorsDetailsViewModel
 import com.example.myapplication.navigation.Route
 import com.example.myapplication.navigation.TopLevelBackStack
 import com.example.myapplication.uikit.RatingBar
+import org.koin.androidx.compose.koinViewModel
+import org.koin.core.parameter.parametersOf
 
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ErrorsDetailsDialog(
     error: ErrorsUiModel,
-    topLevelBackStack: TopLevelBackStack<Route>
 ) {
+    val viewModel = koinViewModel<ErrorsDetailsViewModel>() {
+        parametersOf(error)
+    }
+
+    val state by viewModel.state.collectAsStateWithLifecycle()
+
     ModalBottomSheet(
-        onDismissRequest = { topLevelBackStack.removeLast() },
+        onDismissRequest = { viewModel.onBack() },
 
     ) {
-        ErrorsDetailsContent(error)
+        ErrorsDetailsContent(state, viewModel::onRatingChanged)
     }
 }
 
 @OptIn(ExperimentalGlideComposeApi::class)
 @Composable
-fun ErrorsDetailsContent(errors: ErrorsUiModel) {
+fun ErrorsDetailsContent(
+    state: ErrorsDetailsViewState,
+    onRatingChanged: (Float) -> Unit = {},
+) {
     Column(
         modifier = Modifier
             .padding(horizontal = 12.dp)
             .verticalScroll(rememberScrollState()),
         verticalArrangement = Arrangement.spacedBy(8.dp),
     ) {
-        var rating by remember { mutableFloatStateOf(0f) }
+
 
         val context = LocalContext.current
         Icon(
             Icons.Default.Share,
             null,
             Modifier.clickable {
-                shareText(context, "Error ${errors.code} ${errors.title} cat meme")
+                shareText(context, "Error ${state.errors.code} ${state.errors.title} cat meme")
             }
         )
 
         Text (
-            text = errors.code,
+            text = state.errors.code,
             style = MaterialTheme.typography.titleLarge,
             color = MaterialTheme.colorScheme.onSurfaceVariant
         )
 
         Text(
-            text = errors.title,
+            text = state.errors.title,
             style = MaterialTheme.typography.bodyMedium,
         )
 
 
         GlideImage(
-            model = errors.imageUrl,
-            contentDescription = "Кот - мем с ошибкой ${errors.code}",
+            model = state.errors.imageUrl,
+            contentDescription = "Кот - мем с ошибкой ${state.errors.code}",
             modifier = Modifier.fillMaxWidth(),
             contentScale = ContentScale.FillWidth,
         )
@@ -98,13 +111,18 @@ fun ErrorsDetailsContent(errors: ErrorsUiModel) {
         )
 
         RatingBar(
-            rating,
+            state.rating,
             modifier = Modifier.fillMaxWidth(),
         ) {
-            rating = it
+            onRatingChanged(it)
         }
 
-        Text(text = if (rating > 0f) "Your assessment: $rating" else "You haven't appreciated the meme yet")
+        //Text(text = if (rating > 0f) "Your assessment: $rating" else "You haven't appreciated the meme yet")
+        if (state.userVoteVisible) {
+            Text("Your assessment: ${state.rating}")
+        } else {
+            Text("You haven't appreciated the meme yet")
+        }
 
         Text(
             text = "Description",
@@ -112,24 +130,24 @@ fun ErrorsDetailsContent(errors: ErrorsUiModel) {
         )
 
         Text(
-            text = errors.description,
+            text = state.errors.description,
             style = MaterialTheme.typography.bodyMedium,
         )
 
-        if (!errors.seeAlso.isNullOrEmpty()) {
+        if (!state.errors.seeAlso.isNullOrEmpty()) {
             Text(
                 text = "See Also",
                 style = MaterialTheme.typography.titleMedium,
             )
 
             Column {
-                errors.seeAlso.forEach { seeAlsoItem ->
+                state.errors.seeAlso.forEach { seeAlsoItem ->
                     SeeAlsoListItem(seeAlsoItem)
                 }
             }
         }
 
-        errors.source?.let { source ->
+        state.errors.source?.let { source ->
 
         Text(
             text = "Source",
@@ -181,6 +199,6 @@ fun SeeAlsoListItem(seeAlso: SeeAlsoModel) {
 @Composable
 fun ErrorDetailDialogPreview() {
     ErrorsDetailsContent(
-        MockData.getErrors().first()
+        ErrorsDetailsViewState(MockData.getErrors().first())
     )
 }

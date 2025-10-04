@@ -20,7 +20,9 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.window.DialogProperties
+import androidx.lifecycle.viewmodel.navigation3.rememberViewModelStoreNavEntryDecorator
 import androidx.navigation3.runtime.entryProvider
+import androidx.navigation3.runtime.rememberSavedStateNavEntryDecorator
 import androidx.navigation3.scene.DialogSceneStrategy
 import androidx.navigation3.ui.NavDisplay
 import com.example.myapplication.errors.presentation.model.ErrorsUiModel
@@ -28,6 +30,8 @@ import com.example.myapplication.errors.presentation.screen.ErrorsDetailsDialog
 import com.example.myapplication.errors.presentation.screen.ErrorsListScreen
 import com.example.myapplication.navigation.Route
 import com.example.myapplication.navigation.TopLevelBackStack
+import org.koin.java.KoinJavaComponent.inject
+
 
 interface TopLevelRoute: Route {
     val icon: ImageVector
@@ -45,7 +49,7 @@ data object ReadMore: TopLevelRoute {
 
 @Composable
 fun MainScreen() {
-    val topLevelBackStack = remember { TopLevelBackStack<Route>(Errors) }
+    val topLevelBackStack by inject<TopLevelBackStack<Route>>(clazz = TopLevelBackStack::class.java)
     val dialogStrategy = remember { DialogSceneStrategy<Route>() }
 
     Scaffold(bottomBar = {
@@ -66,6 +70,10 @@ fun MainScreen() {
             onBack = { topLevelBackStack.removeLast() },
             modifier = Modifier.padding(padding),
             sceneStrategy = dialogStrategy,
+            entryDecorators = listOf(
+                rememberSavedStateNavEntryDecorator(),
+                rememberViewModelStoreNavEntryDecorator()
+            ),
             entryProvider = entryProvider {
                 entry<Errors> {
                     ErrorsListScreen(topLevelBackStack)
@@ -76,7 +84,7 @@ fun MainScreen() {
                 entry<ErrorsDetails>(
                     metadata = DialogSceneStrategy.dialog(DialogProperties())
                 ) {
-                    ErrorsDetailsDialog(it.errors, topLevelBackStack )
+                    ErrorsDetailsDialog(it.errors)
                 }
             }
         )
