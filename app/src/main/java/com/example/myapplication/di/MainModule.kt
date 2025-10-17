@@ -10,5 +10,5 @@ import org.koin.dsl.module
 val mainModule = module {
     single { TopLevelBackStack<Route>(Errors) }
 
-    viewModel { ErrorsDetailsViewModel(get(), get()) }
+
 }
