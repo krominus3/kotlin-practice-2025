@@ -2,11 +2,18 @@ package com.example.myapplication.errors.presentation.screen
 
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Settings
+import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.HorizontalDivider
+import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -49,7 +56,8 @@ fun ErrorsListScreen(){
     ErrorsListScreenContent(
         state.state,
         viewModel::onErrorClick,
-        viewModel::onRetryClick
+        viewModel::onRetryClick,
+        viewModel::onSettingsClick
     )
 }
 
@@ -57,27 +65,42 @@ fun ErrorsListScreen(){
 private fun ErrorsListScreenContent(
     state: ErrorsListViewState.State,
     onErrorsClick: (ErrorsUiModel) -> Unit = {},
-    onRetryClick: () -> Unit = {}
+    onRetryClick: () -> Unit = {},
+    onSettingsClick: () -> Unit = {}
 ) {
-    when (state){
-        ErrorsListViewState.State.Loading -> {
-            FullscreenLoading()
-        }
+    Scaffold(
+        floatingActionButton = {
+            FloatingActionButton(onClick = { onSettingsClick() }) {
+                Icon(
+                    imageVector = Icons.Default.Settings,
+                    contentDescription = "Settings"
+                )
+            }
+        },
+        contentWindowInsets = WindowInsets(left = 0.dp),
+    ) {
+        Box(Modifier.padding(it))
 
-        is ErrorsListViewState.State.Fault -> {
-            FullscreenError(
-                retry = { onRetryClick() },
-                text = state.fault
-            )
-        }
+        when (state) {
+            ErrorsListViewState.State.Loading -> {
+                FullscreenLoading()
+            }
 
-        is ErrorsListViewState.State.Success -> {
-            LazyColumn {
-                state.data.forEach { error ->
-                    item {
-                        ErrorsListItem(error) { onErrorsClick(it) }
+            is ErrorsListViewState.State.Fault -> {
+                FullscreenError(
+                    retry = { onRetryClick() },
+                    text = state.fault
+                )
+            }
+
+            is ErrorsListViewState.State.Success -> {
+                LazyColumn {
+                    state.data.forEach { error ->
+                        item {
+                            ErrorsListItem(error) { onErrorsClick(it) }
+                        }
+
                     }
-
                 }
             }
         }

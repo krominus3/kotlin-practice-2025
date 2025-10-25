@@ -3,6 +3,7 @@ package com.example.myapplication.errors.presentation.viewModel
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.myapplication.ErrorsDetails
+import com.example.myapplication.ErrorsSettings
 import com.example.myapplication.core.launchLoadingAndError
 import com.example.myapplication.errors.domain.interactor.ErrorsInteractor
 import com.example.myapplication.errors.domain.model.ErrorsEntity
@@ -39,6 +40,8 @@ class ErrorsListViewModel(
     fun onRetryClick() {
         loadNews()
     }
+
+    fun onSettingsClick() = topLevelBackStack.add(ErrorsSettings)
 
     private fun loadNews(){
         viewModelScope.launchLoadingAndError(
