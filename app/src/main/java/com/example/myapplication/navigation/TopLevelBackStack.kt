@@ -38,6 +38,11 @@ class TopLevelBackStack<T: Route>(startKey: T) {
         updateBackStack()
     }
 
+    fun add(key: T) {
+        topLevelStacks[topLevelKey]?.add(key)
+        updateBackStack()
+    }
+
     fun removeLast(){
         val removedKey = topLevelStacks[topLevelKey]?.removeLastOrNull()
         topLevelStacks.remove(removedKey)

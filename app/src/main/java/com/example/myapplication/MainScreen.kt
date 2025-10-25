@@ -76,7 +76,7 @@ fun MainScreen() {
             ),
             entryProvider = entryProvider {
                 entry<Errors> {
-                    ErrorsListScreen(topLevelBackStack)
+                    ErrorsListScreen()
                 }
                 entry<ReadMore> {
                     ContentGreen("ReadMore") { }

@@ -9,26 +9,76 @@ import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.example.myapplication.Errors
 import com.example.myapplication.ErrorsDetails
 import com.example.myapplication.errors.presentation.MockData
+import com.example.myapplication.errors.presentation.model.ErrorsListViewState
 import com.example.myapplication.errors.presentation.model.ErrorsUiModel
+import com.example.myapplication.errors.presentation.viewModel.ErrorsListViewModel
 import com.example.myapplication.navigation.Route
 import com.example.myapplication.navigation.TopLevelBackStack
+import com.example.myapplication.uikit.FullscreenError
+import com.example.myapplication.uikit.FullscreenLoading
+import org.koin.androidx.compose.koinViewModel
+
+//@Composable
+//fun ErrorsListScreen(topLevelBackStack: TopLevelBackStack<Route>) {
+//    val errors = remember { MockData.getErrors() }
+//
+//    LazyColumn {
+//        errors.forEach { errors ->
+//            item(key = errors.code) {
+//                ErrorsListItem(errors) { topLevelBackStack.addTopLevel(ErrorsDetails(it)) }
+//            }
+//        }
+//    }
+//}
 
 @Composable
-fun ErrorsListScreen(topLevelBackStack: TopLevelBackStack<Route>) {
-    val errors = remember { MockData.getErrors() }
+fun ErrorsListScreen(){
+    val viewModel = koinViewModel<ErrorsListViewModel>()
+    val state by viewModel.viewState.collectAsStateWithLifecycle()
 
-    LazyColumn {
-        errors.forEach { errors ->
-            item(key = errors.code) {
-                ErrorsListItem(errors) { topLevelBackStack.addTopLevel(ErrorsDetails(it)) }
+    ErrorsListScreenContent(
+        state.state,
+        viewModel::onErrorClick,
+        viewModel::onRetryClick
+    )
+}
+
+@Composable
+private fun ErrorsListScreenContent(
+    state: ErrorsListViewState.State,
+    onErrorsClick: (ErrorsUiModel) -> Unit = {},
+    onRetryClick: () -> Unit = {}
+) {
+    when (state){
+        ErrorsListViewState.State.Loading -> {
+            FullscreenLoading()
+        }
+
+        is ErrorsListViewState.State.Fault -> {
+            FullscreenError(
+                retry = { onRetryClick() },
+                text = state.fault
+            )
+        }
+
+        is ErrorsListViewState.State.Success -> {
+            LazyColumn {
+                state.data.forEach { error ->
+                    item {
+                        ErrorsListItem(error) { onErrorsClick(it) }
+                    }
+
+                }
             }
         }
     }
@@ -68,5 +118,5 @@ fun ErrorsListItem(errors: ErrorsUiModel, onErrorsClick: (ErrorsUiModel) -> Unit
 @Preview(showBackground = true)
 @Composable
 fun ErrorsListPreview() {
-    ErrorsListScreen(TopLevelBackStack<Route>(Errors))
+    ErrorsListScreen()
 }
