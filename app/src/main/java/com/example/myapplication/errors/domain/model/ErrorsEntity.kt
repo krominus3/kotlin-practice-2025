@@ -10,6 +10,6 @@ class ErrorsEntity (
     val title: String,
     val imageUrl: String,
     val description: String,
-    val seeAlso: List<SeeAlsoModel>?,
+    val seeAlso: List<SeeAlsoModel>? = emptyList(),
     val source: String?
 )

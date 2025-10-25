@@ -12,7 +12,7 @@ glide-compose = "1.0.0-beta08"
 glide = "5.0.5"
 koinAndroid = "4.1.0"
 retrofit = "3.0.0"
-ksp = "2.2.0-2.0.2"
+ksp = "2.3.0"
 
 materialIconsCore = "1.7.3"
 nav3Core = "1.0.0-alpha10"

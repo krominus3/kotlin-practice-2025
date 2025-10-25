@@ -1,6 +1,7 @@
 package com.example.myapplication
 
 import android.app.Application
+import com.example.myapplication.di.dbModule
 import com.example.myapplication.di.errorsFeaturesModule
 import com.example.myapplication.di.mainModule
 import com.example.myapplication.di.networkModule
@@ -14,7 +15,7 @@ class App: Application() {
         startKoin {
             androidLogger()
             androidContext(this@App)
-            modules(mainModule, errorsFeaturesModule, networkModule)
+            modules(mainModule, errorsFeaturesModule, networkModule, dbModule)
         }
     }
 }

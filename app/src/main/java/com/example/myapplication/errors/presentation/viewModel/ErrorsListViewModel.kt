@@ -8,6 +8,7 @@ import com.example.myapplication.core.launchLoadingAndError
 import com.example.myapplication.errors.domain.interactor.ErrorsInteractor
 import com.example.myapplication.errors.domain.model.ErrorsEntity
 import com.example.myapplication.errors.presentation.MockData
+import com.example.myapplication.errors.presentation.model.ErrorsListFilter
 import com.example.myapplication.errors.presentation.model.ErrorsListViewState
 import com.example.myapplication.errors.presentation.model.ErrorsUiModel
 import com.example.myapplication.errors.presentation.model.SeeAlsoModel
@@ -18,7 +19,6 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.update
-import kotlinx.coroutines.launch
 
 class ErrorsListViewModel(
     private val topLevelBackStack: TopLevelBackStack<Route>,
@@ -30,22 +30,27 @@ class ErrorsListViewModel(
     init {
         mutableState.update {
             it.copy(
-                state = ErrorsListViewState.State.Success(MockData.getErrors())
+                listState = ErrorsListViewState.State.Success(MockData.getErrors())
             )
         }
-        loadNews()
+        loadErrors()
     }
 
     fun onErrorClick(error: ErrorsUiModel) {
         topLevelBackStack.add(ErrorsDetails(error))
     }
     fun onRetryClick() {
-        loadNews()
+        loadErrors()
+    }
+
+    fun onFilterChange(filter: ErrorsListFilter) {
+        mutableState.update { it.copy(currentFilter = filter) }
+        loadErrors()
     }
 
     fun onSettingsClick() = topLevelBackStack.add(ErrorsSettings)
 
-    private fun loadNews(){
+    private fun loadErrors(){
         viewModelScope.launchLoadingAndError(
             handleError = { e -> updateState(ErrorsListViewState.State.Fault(e.localizedMessage.orEmpty())) }
         ) {
@@ -53,7 +58,14 @@ class ErrorsListViewModel(
 
             interactor.observeDescendingSortSettings()
                 .onEach { updateState(ErrorsListViewState.State.Loading) }
-                .map { interactor.getErrors(it) }
+                .map {
+                    if (viewState.value.currentFilter == ErrorsListFilter.ALL){
+                        interactor.getErrors(it)
+
+                    } else {
+                        interactor.getFavorites()
+                    }
+                }
                 .collect { errors ->
                     updateState(ErrorsListViewState.State.Success(mapToUi(errors)))
                 }
@@ -62,7 +74,7 @@ class ErrorsListViewModel(
     }
 
     private fun updateState(state: ErrorsListViewState.State) =
-        mutableState.update { it.copy(state = state) }
+        mutableState.update { it.copy(listState = state) }
 
     private fun mapToUi(errors: List<ErrorsEntity>): List<ErrorsUiModel> = errors.map { error ->
         ErrorsUiModel(

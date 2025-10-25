@@ -15,9 +15,9 @@ class ErrorsResponseToEntityMapper {
                 seeAlso = document.seeAlso?.map { seeAlsoData ->
                     SeeAlsoModel(
                         text = seeAlsoData.text.orEmpty(),
-                        url = seeAlsoData.url.orEmpty()
+                        url = seeAlsoData.url
                     )
-                },
+                } ?: emptyList(),
                 source = document.source
             )
 
