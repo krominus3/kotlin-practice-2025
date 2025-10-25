@@ -15,6 +15,8 @@ import com.example.myapplication.navigation.Route
 import com.example.myapplication.navigation.TopLevelBackStack
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
@@ -48,8 +50,14 @@ class ErrorsListViewModel(
             handleError = { e -> updateState(ErrorsListViewState.State.Fault(e.localizedMessage.orEmpty())) }
         ) {
             updateState(ErrorsListViewState.State.Loading)
-            val errors = interactor.getErrors()
-            updateState(ErrorsListViewState.State.Success(mapToUi(errors)))
+
+            interactor.observeDescendingSortSettings()
+                .onEach { updateState(ErrorsListViewState.State.Loading) }
+                .map { interactor.getErrors(it) }
+                .collect { errors ->
+                    updateState(ErrorsListViewState.State.Success(mapToUi(errors)))
+                }
+
         }
     }
 

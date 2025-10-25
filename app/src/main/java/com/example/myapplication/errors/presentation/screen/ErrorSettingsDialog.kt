@@ -60,7 +60,7 @@ fun NewsSettingsDialog(
             )
             Row(verticalAlignment = Alignment.CenterVertically) {
                 Switch(
-                    checked = state.sortFromEnd,
+                    checked = state.descendingSort,
                     onCheckedChange = { onNewsFirstCheckedChange(it) }
                 )
                 Spacer(Modifier.width(width = Spacing.medium))
@@ -81,5 +81,5 @@ fun NewsSettingsDialog(
 @Preview(showBackground = true)
 @Composable
 fun NewsSettingsDialogPreview() {
-    NewsSettingsDialog(state = ErrorsSettingState(sortFromEnd = true))
+    NewsSettingsDialog(state = ErrorsSettingState(descendingSort = true))
 }

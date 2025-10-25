@@ -14,12 +14,12 @@ import retrofit2.Retrofit
 val errorsFeaturesModule = module {
     viewModel { ErrorsDetailsViewModel(get(), get()) }
     viewModel { ErrorsListViewModel(get(), get()) }
-    viewModel { ErrorsSettingsViewModel(get()) }
+    viewModel { ErrorsSettingsViewModel(get(), get()) }
 
     single {get<Retrofit>().create(ErrorsApi::class.java)}
 
     factory { ErrorsResponseToEntityMapper() }
-    single { ErrorsRepository(get(), get()) }
+    single { ErrorsRepository(get(), get(), get()) }
 
     single { ErrorsInteractor(get()) }
 }
