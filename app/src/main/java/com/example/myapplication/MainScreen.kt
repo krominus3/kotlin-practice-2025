@@ -7,6 +7,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.List
+import androidx.compose.material.icons.filled.AccountCircle
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material3.Icon
 import androidx.compose.material3.NavigationBar
@@ -31,6 +32,8 @@ import com.example.myapplication.errors.presentation.screen.ErrorsListScreen
 import com.example.myapplication.errors.presentation.screen.NewsSettingsDialog
 import com.example.myapplication.navigation.Route
 import com.example.myapplication.navigation.TopLevelBackStack
+import com.example.myapplication.presentation.profile.screen.EditProfileScreen
+import com.example.myapplication.presentation.profile.screen.ProfileScreen
 import org.koin.java.KoinJavaComponent.inject
 
 
@@ -48,7 +51,11 @@ data object ReadMore: TopLevelRoute {
     override val icon: ImageVector = Icons.AutoMirrored.Default.List
 }
 
+data object Profile: TopLevelRoute{
+    override val icon: ImageVector = Icons.Default.AccountCircle
+}
 data object ErrorsSettings: Route
+data object EditProfile: Route
 
 @Composable
 fun MainScreen() {
@@ -57,7 +64,7 @@ fun MainScreen() {
 
     Scaffold(bottomBar = {
         NavigationBar {
-            listOf(Errors, ReadMore).forEach { route ->
+            listOf(Errors, ReadMore, Profile).forEach { route ->
                 NavigationBarItem(
                     icon = { Icon(route.icon, null) },
                     selected = topLevelBackStack.topLevelKey == route,
@@ -93,6 +100,19 @@ fun MainScreen() {
                     metadata = DialogSceneStrategy.dialog(DialogProperties())
                 ) {
                     NewsSettingsDialog()
+                }
+                entry<Profile> {
+                    ProfileScreen(
+                        onEditProfile = {
+                            topLevelBackStack.add(EditProfile)
+                        }
+                    )
+                }
+
+                entry<EditProfile> {
+                    EditProfileScreen(
+                        onBack = { topLevelBackStack.removeLast() }
+                    )
                 }
             }
         )
