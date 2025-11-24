@@ -33,7 +33,6 @@ import com.example.myapplication.R
 import com.example.myapplication.presentation.profile.viewModel.EditProfileViewModel
 import org.koin.androidx.compose.koinViewModel
 import java.io.File
-import java.util.Date
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -95,7 +94,7 @@ fun EditProfileScreen(
                         modifier = Modifier
                             .padding(end = 8.dp)
                             .clickable {
-                                viewModel.onDoneClicked()
+                                viewModel.onDoneClicked(context)
                                 onBack()
                             }
                     )
@@ -140,6 +139,25 @@ fun EditProfileScreen(
                     .fillMaxWidth()
                     .padding(top = 16.dp)
             )
+
+            TextField(
+                value = viewModel.favoriteClassTime,
+                onValueChange = { viewModel.onTimeChanged(it) },
+                label = { Text("Время любимой пары") },
+                placeholder = { Text("HH:mm") },
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(top = 16.dp)
+            )
+
+            if (viewModel.showTimeError) {
+                Text(
+                    text = "Введите время в формате HH:mm",
+                    color = MaterialTheme.colorScheme.error,
+                    style = MaterialTheme.typography.bodySmall,
+                    modifier = Modifier.padding(start = 16.dp, top = 4.dp)
+                )
+            }
         }
     }
 
@@ -155,7 +173,6 @@ fun EditProfileScreen(
         }
     }
 
-    // Камера обработка
     // Камера обработка
     fun onCameraSelected() {
         val pictureFile = try {

@@ -5,10 +5,8 @@ import android.content.Context
 import android.content.Intent
 import android.net.Uri
 import android.os.Environment
-import android.os.Parcelable
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
@@ -30,20 +28,12 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
-import androidx.core.content.FileProvider
 import coil3.compose.AsyncImage
-import com.github.terrakok.modo.Screen
-import com.github.terrakok.modo.ScreenKey
-import com.github.terrakok.modo.generateScreenKey
-import com.github.terrakok.modo.stack.LocalStackNavigation
-import com.github.terrakok.modo.stack.forward
-import kotlinx.parcelize.Parcelize
 import org.koin.androidx.compose.koinViewModel
 import com.example.myapplication.R
 import com.example.myapplication.presentation.profile.utils.SystemBroadcastReceiver
 import com.example.myapplication.presentation.profile.viewModel.ProfileViewModel
 import com.example.myapplication.ui.theme.Typography
-import java.io.File
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -86,6 +76,14 @@ fun ProfileScreen(onEditProfile: () -> Unit) {
 
             Text(text = state.name, style = Typography.headlineLarge)
             Text(text = "Старший разработчик", style = Typography.labelMedium)
+
+            if (state.favoriteClassTime.isNotEmpty()) {
+                Text(
+                    text = "Любимая пара: ${state.favoriteClassTime}",
+                    style = Typography.bodyMedium,
+                    modifier = Modifier.padding(top = 8.dp)
+                )
+            }
 
             Button(onClick = {
                 enqueueDownload("https://www.w3.org/WAI/ER/tests/xhtml/testfiles/resources/pdf/dummy.pdf", context)

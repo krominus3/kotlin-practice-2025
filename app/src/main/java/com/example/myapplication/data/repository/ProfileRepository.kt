@@ -15,12 +15,13 @@ class ProfileRepository: IProfileRepository {
 
     override suspend fun getProfile(): ProfileEntity? = dataStore.data.firstOrNull()
 
-    override suspend fun setProfile(photoUri: String, name: String, url: String) =
+    override suspend fun setProfile(photoUri: String, name: String, url: String, favoriteClassTime: String?) =
         dataStore.updateData {
             it.toBuilder().apply {
                 this.photoUri = photoUri
                 this.name = name
                 this.url = url
+                this.favoriteClassTime = favoriteClassTime
             }.build()
         }
 }

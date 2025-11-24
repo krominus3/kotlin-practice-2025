@@ -7,4 +7,7 @@
     <string name="link">Ссылка</string>
     <string name="camera">Камера</string>
     <string name="gallery">Галерея</string>
+    <string name="favorite_class_time">Время любимой пары</string>
+    <string name="time_format_error">Введите время в формате HH:mm</string>
+    <string name="select_time">Выберите время</string>
 </resources>
