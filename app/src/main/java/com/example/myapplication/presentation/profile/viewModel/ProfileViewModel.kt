@@ -6,6 +6,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 import com.example.myapplication.domain.repository.IProfileRepository
 import com.example.myapplication.presentation.profile.model.state.ProfileState
@@ -20,9 +21,11 @@ class ProfileViewModel(
 
     init {
         viewModelScope.launch {
-            repository.observeProfile().collect {
-                mutableState.name = it.name
-                mutableState.photoUri = it.photoUri.toUri()
+            repository.observeProfile().collect { profile ->
+                mutableState.name = profile.name
+                mutableState.photoUri = profile.photoUri.toUri()
+                // Можно добавить отображение времени пары в профиле, если нужно
+                mutableState.favoriteClassTime = profile.favoriteClassTime ?: ""
             }
         }
     }
@@ -30,6 +33,6 @@ class ProfileViewModel(
     private class MutableProfileState: ProfileState {
         override var name by mutableStateOf("")
         override var photoUri by mutableStateOf(Uri.EMPTY)
-
+        override var favoriteClassTime by mutableStateOf("")
     }
 }
